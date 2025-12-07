@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All Places</title>
+</head>
+<body>
+    <h2>All Places</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Picture URL</th>
+                <th>Category</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>City</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="place : ${listPlaces}">
+                <td th:text="${place.id}"></td>
+                <td th:text="${place.name}"></td>
+                <td th:text="${place.description}"></td>
+                <td th:text="${place.pictureUrl}"></td>
+                <td th:text="${place.category}"></td>
+                <td th:text="${place.latitude}"></td>
+                <td th:text="${place.longitude}"></td>
+                <td th:text="${place.city}"></td>
+                <td>
+                    <a th:href="@{'/places/edit/' + ${place.id}}">Edit</a> |
+                    <a th:href="@{'/places/delete/' + ${place.id}}" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br/>
+    <a href="/places/add">Add New Place</a>
+</body>
+</html>
