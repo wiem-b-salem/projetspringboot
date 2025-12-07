@@ -116,6 +116,8 @@
     <div class="signup-container">
         <h2>🌍 Join Tuniway</h2>
         
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        
         <form th:action="@{/signup-process}" method="post">
             <div class="form-row">
                 <div class="form-group">

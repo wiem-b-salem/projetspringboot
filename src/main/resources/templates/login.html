@@ -105,6 +105,8 @@
     <div class="login-container">
         <h2>🌍 Login to Tuniway</h2>
         
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        
         <form th:action="@{/login-process}" method="post">
             <div class="form-group">
                 <label for="email">Email:</label>

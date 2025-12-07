@@ -71,13 +71,13 @@ public class HomeController {
     }
 
     @PostMapping("/login-process")
-    public String loginProcess(@RequestParam String email, @RequestParam String password, 
+    public String loginProcess(@RequestParam("email") String email, @RequestParam("password") String password, 
                               Model model, HttpSession session) {
         try {
             logger.info("Login attempt for email: " + email);
             User user = userService.findByEmail(email);
             logger.info("User found: " + (user != null));
-            if (user != null && user.getPassword().equals(password)) {
+            if (user != null && user.getPassword() != null && user.getPassword().equals(password)) {
                 logger.info("Password matched for user: " + user.getEmail());
                 session.setAttribute("loggedInUser", user);
                 model.addAttribute("success", "Welcome back, " + user.getFirstName() + "!");
@@ -95,10 +95,10 @@ public class HomeController {
     }
 
     @PostMapping("/signup-process")
-    public String signupProcess(@RequestParam String firstName, @RequestParam String lastName,
-                               @RequestParam String email, @RequestParam String phoneNumber,
-                               @RequestParam String password, @RequestParam String confirmPassword,
-                               @RequestParam String type, Model model, HttpSession session) {
+    public String signupProcess(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName,
+                               @RequestParam("email") String email, @RequestParam(value = "phoneNumber", required = false) String phoneNumber,
+                               @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword,
+                               @RequestParam("type") String type, Model model, HttpSession session) {
         try {
             logger.info("Signup attempt for: " + email + " as type: " + type);
             
@@ -127,7 +127,7 @@ public class HomeController {
             newUser.setFirstName(firstName);
             newUser.setLastName(lastName);
             newUser.setEmail(email);
-            newUser.setPhoneNumber(phoneNumber);
+            newUser.setPhoneNumber(phoneNumber != null && !phoneNumber.trim().isEmpty() ? phoneNumber : null);
             newUser.setPassword(password);
             newUser.setType(type);
             
@@ -188,9 +188,9 @@ public class HomeController {
     }
 
     @PostMapping("/account/update")
-    public String updateAccount(@RequestParam String firstName, @RequestParam String lastName,
-                               @RequestParam String email, @RequestParam String phoneNumber,
-                               @RequestParam(required = false) String password, 
+    public String updateAccount(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName,
+                               @RequestParam("email") String email, @RequestParam("phoneNumber") String phoneNumber,
+                               @RequestParam(value = "password", required = false) String password, 
                                HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
@@ -219,7 +219,7 @@ public class HomeController {
     }
 
     @PostMapping("/account/favorite/delete")
-    public String removeFavorite(@RequestParam Long favoriteId, HttpSession session) {
+    public String removeFavorite(@RequestParam("favoriteId") Long favoriteId, HttpSession session) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/login";
@@ -235,7 +235,7 @@ public class HomeController {
     }
 
     @PostMapping("/account/reservation/cancel")
-    public String cancelReservation(@RequestParam Long reservationId, HttpSession session) {
+    public String cancelReservation(@RequestParam("reservationId") Long reservationId, HttpSession session) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/login";
@@ -251,7 +251,7 @@ public class HomeController {
     }
 
     @PostMapping("/account/review/delete")
-    public String deleteReview(@RequestParam Long reviewId, HttpSession session) {
+    public String deleteReview(@RequestParam("reviewId") Long reviewId, HttpSession session) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
         if (loggedInUser == null) {
             return "redirect:/login";
