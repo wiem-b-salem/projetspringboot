@@ -6,6 +6,7 @@ import java.util.List;
 public interface PlaceService {
     Place createPlace(Place place);
     List<Place> getAllPlaces();
+    List<Place> getAll();
     Place getPlaceById(Long id);
     Place updatePlace(Place place);
     void deletePlace(Long id);

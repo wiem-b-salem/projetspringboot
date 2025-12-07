@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Add User</title>
+    <title>Edit Guide</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
         .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 5px; }
         h2 { color: #333; }
         form { display: flex; flex-direction: column; }
         label { margin-top: 15px; margin-bottom: 5px; color: #333; font-weight: bold; }
-        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 14px; }
+        input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 14px; }
+        textarea { resize: vertical; min-height: 100px; }
         button { margin-top: 20px; padding: 10px; background: #0066cc; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 16px; }
         button:hover { background: #0052a3; }
         .nav-links { margin-bottom: 20px; }
@@ -17,12 +18,12 @@
 </head>
 <body>
     <div class="container">
-        <h2>Add a New User</h2>
+        <h2>Edit Guide</h2>
         <div class="nav-links">
-            <a href="/users/all">Back to List</a>
+            <a href="/admin/guides">Back to Guides</a>
         </div>
 
-        <form th:action="@{/users/save}" th:object="${userForm}" method="post">
+        <form th:action="@{'/admin/guides/update/' + ${guide.id}}" th:object="${guide}" method="post">
             <label for="firstName">First Name:</label>
             <input type="text" id="firstName" th:field="*{firstName}" required/>
 
@@ -38,14 +39,16 @@
             <label for="phoneNumber">Phone Number:</label>
             <input type="text" id="phoneNumber" th:field="*{phoneNumber}"/>
 
-            <label for="type">Type:</label>
-            <select id="type" th:field="*{type}">
-                <option value="CLIENT">Client</option>
-                <option value="ADMIN">Admin</option>
-                <option value="GUIDE">Guide</option>
-            </select>
+            <label for="bio">Bio:</label>
+            <textarea id="bio" th:field="*{bio}"></textarea>
 
-            <button type="submit">Add User</button>
+            <label for="languages">Languages (comma separated):</label>
+            <input type="text" id="languages" placeholder="e.g., English, French, Spanish"/>
+
+            <label for="rating">Rating:</label>
+            <input type="number" step="0.1" id="rating" th:field="*{rating}"/>
+
+            <button type="submit">Update Guide</button>
         </form>
     </div>
 </body>

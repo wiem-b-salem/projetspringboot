@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Account - Tuniway</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 { color: white; font-size: 28px; }
+        .navbar a {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .navbar a.home { background: transparent; border: 2px solid white; }
+        .navbar a.home:hover { background: white; color: #0066cc; }
+        .navbar a.logout { background: #dc3545; margin-left: 10px; }
+        .navbar a.logout:hover { background: #c82333; }
+
+        /* Container */
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+        .tab-button {
+            padding: 12px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            font-weight: bold;
+            color: #333;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background: #0066cc;
+            color: white;
+            border-bottom: 3px solid #0066cc;
+        }
+        .tab-button:hover {
+            background: #0066cc;
+            color: white;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* User Info Card */
+        .info-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .info-card h2 { color: #333; margin-bottom: 20px; font-size: 24px; }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-row label { font-weight: bold; color: #666; }
+        .info-row span { color: #333; }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 5px rgba(0,102,204,0.3);
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 12px 25px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        button.cancel {
+            background: #6c757d;
+        }
+        button.cancel:hover {
+            background: #5a6268;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th {
+            background: #333;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        table tr:hover {
+            background: #f5f5f5;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .action-buttons a, .action-buttons button {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #0066cc;
+        }
+        .action-buttons a.delete, .action-buttons button.delete {
+            background: #dc3545;
+        }
+        .action-buttons a.delete:hover, .action-buttons button.delete:hover {
+            background: #c82333;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .welcome-section h1 { font-size: 36px; margin-bottom: 10px; }
+        .welcome-section p { font-size: 16px; opacity: 0.9; }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>🌍 Tuniway</h1>
+        <div>
+            <a href="/" class="home">← Back to Home</a>
+            <a href="/logout" class="logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- Welcome Section -->
+    <div class="container">
+        <div th:if="${success}" style="background: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+            <span th:text="${success}"></span>
+        </div>
+        
+        <div th:if="${error}" style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+            <span th:text="${error}"></span>
+        </div>
+        
+        <div class="welcome-section">
+            <h1>Welcome, <span th:text="${user.firstName}"></span>!</h1>
+            <p>Manage your account, favorites, reservations, and reviews</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('profile')">👤 Profile</button>
+            <button class="tab-button" onclick="showTab('favorites')">❤️ Favorites</button>
+            <button class="tab-button" onclick="showTab('reservations')">📅 Reservations</button>
+            <button class="tab-button" onclick="showTab('reviews')">⭐ Reviews</button>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content active">
+            <div class="info-card">
+                <h2>Profile Information</h2>
+                <div class="info-row">
+                    <label>Email:</label>
+                    <span th:text="${user.email}"></span>
+                </div>
+                <div class="info-row">
+                    <label>Name:</label>
+                    <span th:text="${user.firstName + ' ' + user.lastName}"></span>
+                </div>
+                <div class="info-row">
+                    <label>Phone:</label>
+                    <span th:text="${user.phoneNumber}"></span>
+                </div>
+                <div class="info-row">
+                    <label>Account Type:</label>
+                    <span th:text="${user.type}"></span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h2>Update Profile</h2>
+                <form action="/account/update" method="post">
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label>
+                        <input type="text" id="firstName" name="firstName" th:value="${user.firstName}"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label>
+                        <input type="text" id="lastName" name="lastName" th:value="${user.lastName}"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" th:value="${user.email}"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">New Password (leave blank to keep current):</label>
+                        <input type="password" id="password" name="password" placeholder="Enter new password"/>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit">Save Changes</button>
+                        <button type="reset" class="cancel">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Favorites Tab -->
+        <div id="favorites" class="tab-content">
+            <h2>My Favorite Places</h2>
+            <div th:if="${favorites != null and favorites.size() > 0}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Place Name</th>
+                            <th>Category</th>
+                            <th>City</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="favorite : ${favorites}">
+                            <td th:text="${favorite.place != null ? favorite.place.name : 'N/A'}"></td>
+                            <td th:text="${favorite.place != null ? favorite.place.category : 'N/A'}"></td>
+                            <td th:text="${favorite.place != null ? favorite.place.city : 'N/A'}"></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" th:href="@{/places/{id}(id=${favorite.place.id})}" class="view">View</a>
+                                    <form action="/account/favorite/delete" method="post" style="display: inline;">
+                                        <input type="hidden" name="favoriteId" th:value="${favorite.id}"/>
+                                        <button type="submit" class="delete" onclick="return confirm('Remove from favorites?')">Remove</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${favorites == null or favorites.size() == 0}" class="empty-state">
+                <p>No favorite places yet. Start exploring!</p>
+            </div>
+        </div>
+
+        <!-- Reservations Tab -->
+        <div id="reservations" class="tab-content">
+            <h2>My Reservations</h2>
+            <div th:if="${reservations != null and reservations.size() > 0}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tour Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reservation : ${reservations}">
+                            <td th:text="${reservation.tour != null ? reservation.tour.name : 'N/A'}"></td>
+                            <td th:text="${reservation.tour != null ? reservation.tour.date : 'N/A'}"></td>
+                            <td>
+                                <span style="color: #28a745; font-weight: bold;">Confirmed</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="view">View Details</a>
+                                    <form action="/account/reservation/cancel" method="post" style="display: inline;">
+                                        <input type="hidden" name="reservationId" th:value="${reservation.id}"/>
+                                        <button type="submit" class="delete" onclick="return confirm('Cancel reservation?')">Cancel</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${reservations == null or reservations.size() == 0}" class="empty-state">
+                <p>No reservations yet. Book a tour to get started!</p>
+            </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div id="reviews" class="tab-content">
+            <h2>My Reviews</h2>
+            <div th:if="${reviews != null and reviews.size() > 0}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tour</th>
+                            <th>Rating</th>
+                            <th>Review</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="review : ${reviews}">
+                            <td th:text="${review.tour != null ? review.tour.name : 'N/A'}"></td>
+                            <td th:text="${review.stars + ' ⭐'}"></td>
+                            <td th:text="${#strings.abbreviate(review.description, 50)}"></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="view">View</a>
+                                    <form action="/account/review/delete" method="post" style="display: inline;">
+                                        <input type="hidden" name="reviewId" th:value="${review.id}"/>
+                                        <button type="submit" class="delete" onclick="return confirm('Delete review?')">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${reviews == null or reviews.size() == 0}" class="empty-state">
+                <p>No reviews yet. Share your experience with other travelers!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2025 Tuniway. All rights reserved.</p>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

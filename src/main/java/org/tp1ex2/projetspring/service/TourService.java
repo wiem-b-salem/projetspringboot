@@ -6,6 +6,7 @@ import java.util.List;
 public interface TourService {
     Tour createTour(Tour tour);
     List<Tour> getAllTours();
+    List<Tour> getAll();
     Tour getTourById(Long id);
     Tour updateTour(Tour tour);
     void deleteTour(Long id);

@@ -38,4 +38,29 @@ public class ReviewServiceImpl implements ReviewService {
     public void deleteReview(Long id) {
         reviewRepository.deleteById(id);
     }
+
+    @Override
+    public Review create(Review review) {
+        return createReview(review);
+    }
+
+    @Override
+    public List<Review> getAll() {
+        return getAllReviews();
+    }
+
+    @Override
+    public Review getById(Long id) {
+        return getReviewById(id);
+    }
+
+    @Override
+    public Review update(Review review) {
+        return updateReview(review);
+    }
+
+    @Override
+    public void delete(Long id) {
+        deleteReview(id);
+    }
 }

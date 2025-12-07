@@ -25,6 +25,11 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
+    public List<Place> getAll() {
+        return getAllPlaces();
+    }
+
+    @Override
     public Place getPlaceById(Long id) {
         return placeRepository.findById(id).orElse(null);
     }

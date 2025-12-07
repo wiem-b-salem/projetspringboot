@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Update Place</title>
+    <title>Edit Tour</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
         .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 5px; }
@@ -9,7 +9,7 @@
         form { display: flex; flex-direction: column; }
         label { margin-top: 15px; margin-bottom: 5px; color: #333; font-weight: bold; }
         input, select, textarea { padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 14px; }
-        textarea { resize: vertical; min-height: 80px; }
+        textarea { resize: vertical; min-height: 100px; }
         button { margin-top: 20px; padding: 10px; background: #0066cc; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 16px; }
         button:hover { background: #0052a3; }
         .nav-links { margin-bottom: 20px; }
@@ -18,23 +18,35 @@
 </head>
 <body>
     <div class="container">
-        <h2>Update Place</h2>
+        <h2>Edit Tour</h2>
         <div class="nav-links">
-            <a href="/places/all">Back to List</a>
+            <a href="/admin/tours">Back to Tours</a>
         </div>
 
-        <form th:action="@{'/places/update/' + ${place.id}}" th:object="${place}" method="post">
-            <label for="name">Name:</label>
+        <form th:action="@{'/admin/tours/update/' + ${tour.id}}" th:object="${tour}" method="post">
+            <label for="name">Tour Name:</label>
             <input type="text" id="name" th:field="*{name}" required/>
 
             <label for="description">Description:</label>
             <textarea id="description" th:field="*{description}" required></textarea>
 
-            <label for="pictureUrl">Picture URL:</label>
-            <input type="text" id="pictureUrl" th:field="*{pictureUrl}"/>
+            <label for="guide">Guide:</label>
+            <select id="guide" th:field="*{guide}">
+                <option value="">Select a Guide</option>
+                <option th:each="guide : ${guides}" th:value="${guide.id}" th:text="${guide.firstName + ' ' + guide.lastName}"></option>
+            </select>
 
-            <label for="category">Category:</label>
-            <input type="text" id="category" th:field="*{category}" required/>
+            <label for="date">Date:</label>
+            <input type="date" id="date" th:field="*{date}" required/>
+
+            <label for="startingHour">Starting Hour:</label>
+            <input type="time" id="startingHour" th:field="*{startingHour}" required/>
+
+            <label for="endingHour">Ending Hour:</label>
+            <input type="time" id="endingHour" th:field="*{endingHour}" required/>
+
+            <label for="price">Price:</label>
+            <input type="number" step="0.01" id="price" th:field="*{price}" required/>
 
             <label for="latitude">Latitude:</label>
             <input type="number" step="any" id="latitude" th:field="*{latitude}"/>
@@ -42,10 +54,7 @@
             <label for="longitude">Longitude:</label>
             <input type="number" step="any" id="longitude" th:field="*{longitude}"/>
 
-            <label for="city">City:</label>
-            <input type="text" id="city" th:field="*{city}" required/>
-
-            <button type="submit">Update Place</button>
+            <button type="submit">Update Tour</button>
         </form>
     </div>
 </body>

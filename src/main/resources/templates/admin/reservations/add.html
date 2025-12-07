@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Reservation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 20px; border-radius: 5px; }
+        h2 { color: #333; }
+        form { display: flex; flex-direction: column; }
+        label { margin-top: 15px; margin-bottom: 5px; color: #333; font-weight: bold; }
+        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 14px; }
+        button { margin-top: 20px; padding: 10px; background: #0066cc; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0052a3; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { padding: 8px 15px; background: #666; color: white; text-decoration: none; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add New Reservation</h2>
+        <div class="nav-links">
+            <a href="/admin/reservations">Back to Reservations</a>
+        </div>
+
+        <form th:action="@{/admin/reservations/save}" th:object="${reservation}" method="post">
+            <label for="user">User:</label>
+            <select id="user" th:field="*{user}">
+                <option value="">Select a User</option>
+                <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.firstName + ' ' + user.lastName}"></option>
+            </select>
+
+            <label for="tour">Tour:</label>
+            <select id="tour" th:field="*{tour}">
+                <option value="">Select a Tour</option>
+                <option th:each="tour : ${tours}" th:value="${tour.id}" th:text="${tour.name}"></option>
+            </select>
+
+            <button type="submit">Add Reservation</button>
+        </form>
+    </div>
+</body>
+</html>

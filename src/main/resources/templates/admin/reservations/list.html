@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>All Places</title>
+    <title>Reservations Management</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
         .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 5px; }
@@ -16,48 +16,38 @@
         .actions a { margin-right: 10px; padding: 5px 10px; background: #0066cc; color: white; text-decoration: none; border-radius: 3px; font-size: 12px; }
         .actions a.delete { background: #d9534f; }
         .actions a:hover { opacity: 0.8; }
-        .description { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>All Places</h2>
+        <h2>Reservations Management</h2>
         <div class="nav-links">
             <a href="/admin/dashboard">Dashboard</a>
-            <a href="/places/add">Add New Place</a>
+            <a href="/admin/reservations/add">Add New Reservation</a>
         </div>
 
-        <table>
+        <table th:if="${reservations.size() > 0}">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Picture URL</th>
-                    <th>Category</th>
-                    <th>Latitude</th>
-                    <th>Longitude</th>
-                    <th>City</th>
+                    <th>User</th>
+                    <th>Tour</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="place : ${listPlaces}">
-                    <td th:text="${place.id}"></td>
-                    <td th:text="${place.name}"></td>
-                    <td class="description" th:text="${place.description}"></td>
-                    <td th:text="${place.pictureUrl}"></td>
-                    <td th:text="${place.category}"></td>
-                    <td th:text="${place.latitude}"></td>
-                    <td th:text="${place.longitude}"></td>
-                    <td th:text="${place.city}"></td>
+                <tr th:each="reservation : ${reservations}">
+                    <td th:text="${reservation.id}"></td>
+                    <td th:text="${reservation.user != null ? reservation.user.firstName + ' ' + reservation.user.lastName : 'N/A'}"></td>
+                    <td th:text="${reservation.tour != null ? reservation.tour.name : 'N/A'}"></td>
                     <td class="actions">
-                        <a th:href="@{'/places/edit/' + ${place.id}}">Edit</a>
-                        <a class="delete" th:href="@{'/places/delete/' + ${place.id}}" onclick="return confirm('Are you sure?')">Delete</a>
+                        <a th:href="@{'/admin/reservations/edit/' + ${reservation.id}}">Edit</a>
+                        <a class="delete" th:href="@{'/admin/reservations/delete/' + ${reservation.id}}" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <p th:if="${reservations.size() == 0}">No reservations found.</p>
     </div>
 </body>
 </html>

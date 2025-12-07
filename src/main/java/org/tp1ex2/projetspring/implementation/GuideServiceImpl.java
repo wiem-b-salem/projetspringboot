@@ -38,4 +38,29 @@ public class GuideServiceImpl implements GuideService {
     public void deleteGuide(Long id) {
         guideRepository.deleteById(id);
     }
+
+    @Override
+    public Guide create(Guide guide) {
+        return createGuide(guide);
+    }
+
+    @Override
+    public List<Guide> getAll() {
+        return getAllGuides();
+    }
+
+    @Override
+    public Guide getById(Long id) {
+        return getGuideById(id);
+    }
+
+    @Override
+    public Guide update(Guide guide) {
+        return updateGuide(guide);
+    }
+
+    @Override
+    public void delete(Long id) {
+        deleteGuide(id);
+    }
 }
