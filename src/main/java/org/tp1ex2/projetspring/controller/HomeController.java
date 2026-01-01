@@ -14,6 +14,7 @@ import org.tp1ex2.projetspring.service.TourService;
 import org.tp1ex2.projetspring.service.FavoriteService;
 import org.tp1ex2.projetspring.service.ReservationService;
 import org.tp1ex2.projetspring.service.ReviewService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,9 @@ public class HomeController {
 
     @Autowired
     private ReviewService reviewService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
     public String index(Model model, HttpSession session) {
@@ -77,16 +81,24 @@ public class HomeController {
             logger.info("Login attempt for email: " + email);
             User user = userService.findByEmail(email);
             logger.info("User found: " + (user != null));
-            if (user != null && user.getPassword() != null && user.getPassword().equals(password)) {
-                logger.info("Password matched for user: " + user.getEmail());
-                session.setAttribute("loggedInUser", user);
-                model.addAttribute("success", "Welcome back, " + user.getFirstName() + "!");
-                return "redirect:/account";
-            } else {
-                logger.warn("Invalid email or password for: " + email);
-                model.addAttribute("error", "Invalid email or password");
-                return "login";
+            if (user != null && user.getPassword() != null) {
+                // Check password - supports both hashed (new users) and plain text (old users for backward compatibility)
+                logger.info("Checking password for user: " + email + ", stored password length: " + user.getPassword().length());
+                logger.info("Stored password starts with: " + (user.getPassword().length() > 2 ? user.getPassword().substring(0, Math.min(10, user.getPassword().length())) : "N/A"));
+                boolean passwordMatches = passwordEncoder.matches(password, user.getPassword());
+                logger.info("Password match result: " + passwordMatches);
+                if (passwordMatches) {
+                    logger.info("Password matched for user: " + user.getEmail());
+                    session.setAttribute("loggedInUser", user);
+                    model.addAttribute("success", "Welcome back, " + user.getFirstName() + "!");
+                    return "redirect:/account";
+                } else {
+                    logger.warn("Password did not match for user: " + email);
+                }
             }
+            logger.warn("Invalid email or password for: " + email);
+            model.addAttribute("error", "Invalid email or password");
+            return "login";
         } catch (Exception e) {
             logger.error("Login failed", e);
             model.addAttribute("error", "Login failed: " + e.getMessage());
@@ -128,7 +140,7 @@ public class HomeController {
             newUser.setLastName(lastName);
             newUser.setEmail(email);
             newUser.setPhoneNumber(phoneNumber != null && !phoneNumber.trim().isEmpty() ? phoneNumber : null);
-            newUser.setPassword(password);
+            newUser.setPassword(passwordEncoder.encode(password)); // Encode password like REST API
             newUser.setType(type);
             
             logger.info("Saving user: " + email);
@@ -204,7 +216,7 @@ public class HomeController {
             loggedInUser.setPhoneNumber(phoneNumber);
             
             if (password != null && !password.isEmpty()) {
-                loggedInUser.setPassword(password);
+                loggedInUser.setPassword(passwordEncoder.encode(password)); // Encode password when updating
             }
             
             User updatedUser = userService.update(loggedInUser);
