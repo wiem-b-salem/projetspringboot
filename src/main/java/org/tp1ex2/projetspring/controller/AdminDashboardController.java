@@ -34,9 +34,6 @@ public class AdminDashboardController {
     @Autowired
     private FavoriteService favoriteService;
 
-    @Autowired
-    private AdminService adminService;
-
     // Dashboard
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
