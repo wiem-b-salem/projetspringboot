@@ -71,5 +71,19 @@ public class JwtUtil {
         final String extractedUsername = extractUsername(token);
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
+
+    public String extractUserType(String token) {
+        Claims claims = extractAllClaims(token);
+        return (String) claims.get("type");
+    }
+
+    public Boolean isAdminToken(String token) {
+        try {
+            String userType = extractUserType(token);
+            return "ADMIN".equals(userType);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
 

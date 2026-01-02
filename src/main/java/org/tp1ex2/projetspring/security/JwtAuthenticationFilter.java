@@ -43,13 +43,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            try {
+                // Check if this is an admin token
+                if (jwtUtil.isAdminToken(jwt)) {
+                    // For admin tokens, create UserDetails directly without database lookup
+                    UserDetails adminDetails = org.springframework.security.core.userdetails.User.builder()
+                            .username(username)
+                            .password("") // Password not needed for JWT validation
+                            .authorities("ADMIN")
+                            .build();
+                    
+                    if (jwtUtil.validateToken(jwt, username)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                adminDetails, null, adminDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                } else {
+                    // For regular user tokens, load from database
+                    UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(jwt, username)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    if (jwtUtil.validateToken(jwt, username)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("Error processing JWT token", e);
             }
         }
         chain.doFilter(request, response);

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tp1ex2.projetspring.model.Place;
+import org.tp1ex2.projetspring.security.JwtUtil;
 import org.tp1ex2.projetspring.service.PlaceService;
 
 import java.util.List;
@@ -16,8 +17,26 @@ public class PlaceRestController {
     @Autowired
     private PlaceService placeService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private boolean isAdminAuthenticated(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return false;
+        }
+        String token = authHeader.substring(7);
+        try {
+            return jwtUtil.isAdminToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @PostMapping("/save")
-    public ResponseEntity<Place> savePlace(@RequestBody Place place) {
+    public ResponseEntity<Place> savePlace(@RequestBody Place place, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Place savedPlace = placeService.createPlace(place);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPlace);
@@ -27,7 +46,10 @@ public class PlaceRestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Place>> getAllPlaces() {
+    public ResponseEntity<List<Place>> getAllPlaces(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Place> places = placeService.getAll();
             return ResponseEntity.ok(places);
@@ -37,7 +59,10 @@ public class PlaceRestController {
     }
 
     @GetMapping("/getone/{id}")
-    public ResponseEntity<Place> getPlace(@PathVariable("id") Long id) {
+    public ResponseEntity<Place> getPlace(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Place place = placeService.getPlaceById(id);
             if (place != null) {
@@ -51,7 +76,10 @@ public class PlaceRestController {
     }
 
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<Place>> getPlacesByCategory(@PathVariable("category") String category) {
+    public ResponseEntity<List<Place>> getPlacesByCategory(@PathVariable("category") String category, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Place> places = placeService.getAllPlaces();
             return ResponseEntity.ok(places);
@@ -61,7 +89,10 @@ public class PlaceRestController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Place> updatePlace(@RequestBody Place place, @PathVariable("id") Long id) {
+    public ResponseEntity<Place> updatePlace(@RequestBody Place place, @PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Place existingPlace = placeService.getPlaceById(id);
             if (existingPlace != null) {
@@ -77,7 +108,10 @@ public class PlaceRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePlace(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deletePlace(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             placeService.deletePlace(id);
             return ResponseEntity.noContent().build();

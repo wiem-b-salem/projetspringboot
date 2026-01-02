@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.tp1ex2.projetspring.model.Admin;
 import org.tp1ex2.projetspring.model.Guide;
 import org.tp1ex2.projetspring.model.User;
 import org.tp1ex2.projetspring.security.JwtUtil;
+import org.tp1ex2.projetspring.service.AdminService;
 import org.tp1ex2.projetspring.service.UserService;
 
 @RestController
@@ -34,6 +36,40 @@ public class AuthRestController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AdminService adminService;
+
+    @PostMapping("/admin/login")
+    public ResponseEntity<Map<String, Object>> adminLogin(@RequestBody Map<String, String> loginRequest) {
+        try {
+            String login = loginRequest.get("login");
+            String password = loginRequest.get("password");
+
+            // Find admin
+            Admin admin = adminService.findByLogin(login);
+            
+            if (admin == null || admin.getPassword() == null || !admin.getPassword().equals(password)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+
+            // Generate JWT token with "ADMIN" type
+            String token = jwtUtil.generateToken(admin.getLogin(), "ADMIN");
+
+            // Prepare response
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("type", "Bearer");
+            response.put("admin", Map.of(
+                    "id", admin.getId(),
+                    "login", admin.getLogin()
+            ));
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {

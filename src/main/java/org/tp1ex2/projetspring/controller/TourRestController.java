@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tp1ex2.projetspring.model.Tour;
+import org.tp1ex2.projetspring.security.JwtUtil;
 import org.tp1ex2.projetspring.service.TourService;
 
 import java.util.List;
@@ -16,8 +17,26 @@ public class TourRestController {
     @Autowired
     private TourService tourService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private boolean isAdminAuthenticated(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return false;
+        }
+        String token = authHeader.substring(7);
+        try {
+            return jwtUtil.isAdminToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @PostMapping("/save")
-    public ResponseEntity<Tour> saveTour(@RequestBody Tour tour) {
+    public ResponseEntity<Tour> saveTour(@RequestBody Tour tour, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Tour savedTour = tourService.createTour(tour);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedTour);
@@ -27,7 +46,10 @@ public class TourRestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Tour>> getAllTours() {
+    public ResponseEntity<List<Tour>> getAllTours(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Tour> tours = tourService.getAll();
             return ResponseEntity.ok(tours);
@@ -37,7 +59,10 @@ public class TourRestController {
     }
 
     @GetMapping("/getone/{id}")
-    public ResponseEntity<Tour> getTour(@PathVariable("id") Long id) {
+    public ResponseEntity<Tour> getTour(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Tour tour = tourService.getTourById(id);
             if (tour != null) {
@@ -51,7 +76,10 @@ public class TourRestController {
     }
 
     @GetMapping("/guide/{guideId}")
-    public ResponseEntity<List<Tour>> getToursByGuide(@PathVariable("guideId") Long guideId) {
+    public ResponseEntity<List<Tour>> getToursByGuide(@PathVariable("guideId") Long guideId, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Tour> tours = tourService.getAllTours();
             return ResponseEntity.ok(tours);
@@ -61,7 +89,10 @@ public class TourRestController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Tour> updateTour(@RequestBody Tour tour, @PathVariable("id") Long id) {
+    public ResponseEntity<Tour> updateTour(@RequestBody Tour tour, @PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Tour existingTour = tourService.getTourById(id);
             if (existingTour != null) {
@@ -77,7 +108,10 @@ public class TourRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTour(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteTour(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             tourService.deleteTour(id);
             return ResponseEntity.noContent().build();

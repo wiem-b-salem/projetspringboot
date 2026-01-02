@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Login - Tuniway</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Tuniway</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -25,8 +27,15 @@
         .login-container h2 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             font-size: 28px;
+        }
+        
+        .login-container .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
         }
         
         .form-group {
@@ -74,20 +83,20 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
         
-        .signup-link {
+        .back-link {
             text-align: center;
             margin-top: 20px;
             font-size: 14px;
             color: #666;
         }
         
-        .signup-link a {
+        .back-link a {
             color: #667eea;
             text-decoration: none;
             font-weight: bold;
         }
         
-        .signup-link a:hover {
+        .back-link a:hover {
             text-decoration: underline;
         }
         
@@ -99,35 +108,43 @@
             margin-bottom: 20px;
             border: 1px solid #f5c6cb;
         }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #bee5eb;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2>🌍 Login to Tuniway</h2>
+        <h2>🏛️ Admin Login</h2>
+        <p class="subtitle">Administrator Access Only</p>
         
         <div th:if="${error}" class="error" th:text="${error}"></div>
         
-        <form th:action="@{/login-process}" method="post">
+        <form th:action="@{/admin/login-process}" method="post">
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required placeholder="Enter your email"/>
+                <label for="login">Admin Login:</label>
+                <input type="text" id="login" name="login" required placeholder="Enter admin login" autofocus/>
             </div>
             
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required placeholder="Enter your password"/>
+                <input type="password" id="password" name="password" required placeholder="Enter password"/>
             </div>
             
-            <button type="submit">Login</button>
+            <button type="submit">Login as Admin</button>
         </form>
         
-        <div class="signup-link">
-            Don't have an account? <a href="/signup">Sign up here</a>
-        </div>
-        
-        <div class="signup-link" style="margin-top: 15px;">
-            <a href="/admin/login" style="color: #667eea; text-decoration: none; font-weight: bold;">🏛️ Admin Login</a>
+        <div class="back-link">
+            <a href="/">← Back to Home</a>
         </div>
     </div>
 </body>
 </html>
+

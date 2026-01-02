@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tp1ex2.projetspring.model.Reservation;
+import org.tp1ex2.projetspring.security.JwtUtil;
 import org.tp1ex2.projetspring.service.ReservationService;
 
 import java.util.List;
@@ -16,8 +17,26 @@ public class ReservationRestController {
     @Autowired
     private ReservationService reservationService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private boolean isAdminAuthenticated(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return false;
+        }
+        String token = authHeader.substring(7);
+        try {
+            return jwtUtil.isAdminToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @PostMapping("/save")
-    public ResponseEntity<Reservation> saveReservation(@RequestBody Reservation reservation) {
+    public ResponseEntity<Reservation> saveReservation(@RequestBody Reservation reservation, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Reservation savedReservation = reservationService.create(reservation);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedReservation);
@@ -27,7 +46,10 @@ public class ReservationRestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Reservation>> getAllReservations() {
+    public ResponseEntity<List<Reservation>> getAllReservations(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Reservation> reservations = reservationService.getAll();
             return ResponseEntity.ok(reservations);
@@ -37,7 +59,10 @@ public class ReservationRestController {
     }
 
     @GetMapping("/getone/{id}")
-    public ResponseEntity<Reservation> getReservation(@PathVariable("id") Long id) {
+    public ResponseEntity<Reservation> getReservation(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Reservation reservation = reservationService.getById(id);
             if (reservation != null) {
@@ -51,7 +76,10 @@ public class ReservationRestController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Reservation>> getReservationsByUser(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<Reservation>> getReservationsByUser(@PathVariable("userId") Long userId, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Reservation> reservations = reservationService.getAll();
             return ResponseEntity.ok(reservations);
@@ -61,7 +89,10 @@ public class ReservationRestController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Reservation> updateReservation(@RequestBody Reservation reservation, @PathVariable("id") Long id) {
+    public ResponseEntity<Reservation> updateReservation(@RequestBody Reservation reservation, @PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Reservation existingReservation = reservationService.getById(id);
             if (existingReservation != null) {
@@ -77,7 +108,10 @@ public class ReservationRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteReservation(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             reservationService.delete(id);
             return ResponseEntity.noContent().build();

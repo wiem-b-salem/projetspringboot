@@ -52,12 +52,14 @@ public class SecurityConfig {
                 // Public endpoints for MVC (Thymeleaf pages)
                 .requestMatchers("/", "/login", "/signup", "/login-process", "/signup-process", 
                                 "/css/**", "/js/**", "/images/**", "/error").permitAll()
+                // Admin login page is public
+                .requestMatchers("/admin/login", "/admin/login-process").permitAll()
                 // Public REST endpoints for authentication
                 .requestMatchers("/api/auth/**").permitAll()
                 // All other API endpoints require authentication
                 .requestMatchers("/api/**").authenticated()
-                // Admin dashboard pages
-                .requestMatchers("/admin/**").authenticated()
+                // Admin dashboard pages (will be checked by controller)
+                .requestMatchers("/admin/**").permitAll()
                 // Account pages require authentication
                 .requestMatchers("/account/**").authenticated()
                 // All other requests

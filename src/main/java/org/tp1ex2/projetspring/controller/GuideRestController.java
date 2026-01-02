@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.tp1ex2.projetspring.model.Guide;
+import org.tp1ex2.projetspring.security.JwtUtil;
 import org.tp1ex2.projetspring.service.GuideService;
 
 import java.util.List;
@@ -16,8 +17,26 @@ public class GuideRestController {
     @Autowired
     private GuideService guideService;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    private boolean isAdminAuthenticated(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return false;
+        }
+        String token = authHeader.substring(7);
+        try {
+            return jwtUtil.isAdminToken(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @PostMapping("/save")
-    public ResponseEntity<Guide> saveGuide(@RequestBody Guide guide) {
+    public ResponseEntity<Guide> saveGuide(@RequestBody Guide guide, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Guide savedGuide = guideService.create(guide);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedGuide);
@@ -27,7 +46,10 @@ public class GuideRestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Guide>> getAllGuides() {
+    public ResponseEntity<List<Guide>> getAllGuides(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Guide> guides = guideService.getAll();
             return ResponseEntity.ok(guides);
@@ -37,7 +59,10 @@ public class GuideRestController {
     }
 
     @GetMapping("/getone/{id}")
-    public ResponseEntity<Guide> getGuide(@PathVariable("id") Long id) {
+    public ResponseEntity<Guide> getGuide(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Guide guide = guideService.getById(id);
             if (guide != null) {
@@ -51,7 +76,10 @@ public class GuideRestController {
     }
 
     @GetMapping("/rating/{minRating}")
-    public ResponseEntity<List<Guide>> getGuidesByRating(@PathVariable("minRating") Double minRating) {
+    public ResponseEntity<List<Guide>> getGuidesByRating(@PathVariable("minRating") Double minRating, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             List<Guide> guides = guideService.getAll();
             return ResponseEntity.ok(guides);
@@ -61,7 +89,10 @@ public class GuideRestController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Guide> updateGuide(@RequestBody Guide guide, @PathVariable("id") Long id) {
+    public ResponseEntity<Guide> updateGuide(@RequestBody Guide guide, @PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             Guide existingGuide = guideService.getById(id);
             if (existingGuide != null) {
@@ -77,7 +108,10 @@ public class GuideRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGuide(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteGuide(@PathVariable("id") Long id, @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (!isAdminAuthenticated(authHeader)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         try {
             guideService.delete(id);
             return ResponseEntity.noContent().build();
