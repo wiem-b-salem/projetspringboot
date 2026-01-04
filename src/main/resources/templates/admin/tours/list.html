@@ -1,61 +1,87 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Tours Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tours Management - Tuniway</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 5px; }
-        h2 { color: #333; }
-        .nav-links { margin-bottom: 20px; }
-        .nav-links a { margin-right: 15px; padding: 8px 15px; background: #0066cc; color: white; text-decoration: none; border-radius: 3px; }
-        .nav-links a:hover { background: #0052a3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        table th { background-color: #333; color: white; padding: 12px; text-align: left; }
-        table td { padding: 10px; border-bottom: 1px solid #ddd; }
-        table tr:hover { background-color: #f5f5f5; }
-        .actions a { margin-right: 10px; padding: 5px 10px; background: #0066cc; color: white; text-decoration: none; border-radius: 3px; font-size: 12px; }
-        .actions a.delete { background: #d9534f; }
-        .actions a:hover { opacity: 0.8; }
+        body { background-color: var(--light-bg); }
+        .container { max-width: 87.5rem; margin: 0 auto; padding: 1.875rem; }
+        .header { background: white; padding: 1.5625rem 1.875rem; border-radius: 0.5rem; box-shadow: var(--shadow-md); margin-bottom: 1.875rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .header h1 { color: var(--text-primary); font-size: 1.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.625rem; }
+        .nav-links { display: flex; gap: 0.9375rem; flex-wrap: wrap; }
+        .nav-links a { padding: 0.625rem 1.25rem; background: var(--secondary-color); color: white; text-decoration: none; border-radius: 0.375rem; font-weight: 500; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
+        .nav-links a:hover { background: #2563eb; }
+        .table-container { background: white; border-radius: 0.5rem; box-shadow: var(--shadow-md); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        table thead th { background: var(--text-primary); color: white; padding: 1rem 1.25rem; text-align: left; font-weight: 600; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        table tbody td { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+        table tbody tr:hover { background-color: var(--light-bg); }
+        .actions { display: flex; gap: 0.5rem; }
+        .actions a { padding: 0.375rem 0.75rem; background: var(--secondary-color); color: white; text-decoration: none; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 0.25rem; transition: all 0.2s; }
+        .actions a:hover { background: #2563eb; }
+        .actions a.delete { background: var(--danger-color); }
+        .actions a.delete:hover { background: #dc2626; }
+        .empty-state { background: white; border-radius: 0.5rem; box-shadow: var(--shadow-md); padding: 2rem; text-align: center; color: var(--text-secondary); }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Tours Management</h2>
-        <div class="nav-links">
-            <a href="/admin/dashboard">Dashboard</a>
-            <a href="/admin/tours/add">Add New Tour</a>
+        <div class="header">
+            <h1>
+                <i class="fas fa-map"></i> Tours Management
+            </h1>
+            <div class="nav-links">
+                <a href="/admin/dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="/admin/tours/add">
+                    <i class="fas fa-plus-circle"></i> Add New Tour
+                </a>
+            </div>
         </div>
 
-        <table th:if="${tours.size() > 0}">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Guide</th>
-                    <th>Date</th>
-                    <th>Price</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="tour : ${tours}">
-                    <td th:text="${tour.id}"></td>
-                    <td th:text="${tour.name}"></td>
-                    <td th:text="${tour.guide != null ? tour.guide.firstName + ' ' + tour.guide.lastName : 'N/A'}"></td>
-                    <td th:text="${tour.date}"></td>
-                    <td th:text="'$' + ${tour.price}"></td>
-                    <td th:text="${tour.startingHour}"></td>
-                    <td th:text="${tour.endingHour}"></td>
-                    <td class="actions">
-                        <a th:href="@{'/admin/tours/edit/' + ${tour.id}}">Edit</a>
-                        <a class="delete" th:href="@{'/admin/tours/delete/' + ${tour.id}}" onclick="return confirm('Are you sure?')">Delete</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <p th:if="${tours.size() == 0}">No tours found.</p>
+        <div th:if="${tours.size() > 0}" class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Guide</th>
+                        <th>Date</th>
+                        <th>Price</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tour : ${tours}">
+                        <td th:text="${tour.id}"></td>
+                        <td th:text="${tour.name}"></td>
+                        <td th:text="${tour.guide != null ? tour.guide.firstName + ' ' + tour.guide.lastName : 'N/A'}"></td>
+                        <td th:text="${tour.date}"></td>
+                        <td th:text="'$' + ${tour.price}"></td>
+                        <td th:text="${tour.startingHour}"></td>
+                        <td th:text="${tour.endingHour}"></td>
+                        <td class="actions">
+                            <a th:href="@{'/admin/tours/edit/' + ${tour.id}}">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a class="delete" th:href="@{'/admin/tours/delete/' + ${tour.id}}" onclick="return confirm('Are you sure?')">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div th:if="${tours.size() == 0}" class="empty-state">
+            <i class="fas fa-inbox" style="font-size: 2.5rem; color: var(--text-secondary); margin-bottom: 1rem; display: block;"></i>
+            <p>No tours found. <a href="/admin/tours/add" style="color: var(--secondary-color); text-decoration: none; font-weight: 600;">Create one</a></p>
+        </div>
     </div>
 </body>
 </html>

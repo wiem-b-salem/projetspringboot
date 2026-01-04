@@ -16,6 +16,7 @@ public class GuideServiceImpl implements GuideService {
 
     @Override
     public Guide createGuide(Guide guide) {
+        guide.setType("GUIDE");
         return guideRepository.save(guide);
     }
 
@@ -31,6 +32,7 @@ public class GuideServiceImpl implements GuideService {
 
     @Override
     public Guide updateGuide(Guide guide) {
+        guide.setType("GUIDE");
         return guideRepository.saveAndFlush(guide);
     }
 

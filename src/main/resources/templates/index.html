@@ -2,249 +2,100 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tuniway - Tour Booking Platform</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
-        
-        /* Navbar */
         .navbar {
-            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
-            padding: 15px 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            padding: 1rem 2rem;
         }
-        .navbar h1 { color: white; font-size: 28px; }
-        .nav-buttons { display: flex; gap: 15px; }
-        .nav-buttons a {
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .nav-buttons a.login {
-            background: transparent;
-            border: 2px solid white;
-        }
-        .nav-buttons a.login:hover {
-            background: white;
-            color: #0066cc;
-        }
-        .nav-buttons a.signup {
-            background: white;
-            color: #0066cc;
-        }
-        .nav-buttons a.signup:hover {
-            background: #f0f0f0;
-        }
-        .nav-buttons a.account-btn {
-            background: #28a745;
-            color: white;
-        }
-        .nav-buttons a.account-btn:hover {
-            background: #218838;
-        }
-        .nav-buttons a.logout-btn {
-            background: #dc3545;
-            color: white;
-        }
-        .nav-buttons a.logout-btn:hover {
-            background: #c82333;
-        }
-        
-        /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 60px 20px;
-            text-align: center;
-        }
-        .hero h2 { font-size: 42px; margin-bottom: 10px; }
-        .hero p { font-size: 18px; margin-bottom: 30px; }
-        .hero .search-bar {
-            max-width: 500px;
-            margin: 0 auto;
-            display: flex;
-            gap: 10px;
-        }
-        .hero input {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .hero button {
-            padding: 12px 25px;
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .hero button:hover { background: #ee5a52; }
-        
-        /* Section Title */
-        .section-title {
-            text-align: center;
-            margin: 50px 0 30px;
-            font-size: 32px;
-            color: #333;
-        }
-        
-        /* Gallery */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 50px;
-        }
-        .place-card {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-        }
-        .place-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .place-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-        }
-        .place-content {
-            padding: 20px;
-        }
-        .place-content h3 {
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .place-content p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-        .place-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #999;
-        }
-        .category-badge {
-            display: inline-block;
-            background: #e3f2fd;
-            color: #0066cc;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-        
-        /* Tours Section */
-        .tours-section {
-            margin-bottom: 50px;
+            padding: 4rem 2rem;
         }
         .tour-card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 2rem;
             align-items: center;
-            transition: box-shadow 0.3s;
         }
         .tour-card:hover {
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .tour-content h3 {
-            color: #333;
-            margin-bottom: 8px;
+        .tour-info h3 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
         }
-        .tour-content p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 5px;
+        .tour-info p {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tour-booking {
+            text-align: right;
         }
         .tour-price {
-            font-size: 24px;
-            color: #ff6b6b;
-            font-weight: bold;
+            font-size: 1.875rem;
+            color: #3b82f6;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
         }
-        .tour-button {
-            padding: 10px 20px;
-            background: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .tour-button:hover { background: #0052a3; }
-        
-        /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 40px;
-            color: #999;
+            padding: 2.5rem;
+            color: #9ca3af;
         }
-        
-        /* Footer */
-        .footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            margin-top: 50px;
+        @media (max-width: 768px) {
+            .tour-card {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .tour-booking {
+                text-align: left;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <div class="navbar">
-        <h1>🌍 Tuniway</h1>
+        <h1>Tuniway</h1>
         <div class="nav-buttons">
             <div th:if="${isLoggedIn}">
-                <a href="/account" class="account-btn">👤 Account</a>
-                <a href="/logout" class="logout-btn">Logout</a>
+                <a href="/account" class="account-btn">
+                    <i class="fas fa-user"></i> Account
+                </a>
+                <form action="/logout" method="post" style="display: inline;">
+                    <button type="submit" class="logout-btn" style="margin: 0;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
             </div>
             <div th:if="${!isLoggedIn}">
                 <a href="/login" class="login">Login</a>
                 <a href="/signup" class="signup">Sign Up</a>
             </div>
-            <a href="/admin/login" style="background: #ff6b6b; padding: 10px 20px; border-radius: 5px; text-decoration: none; color: white; font-weight: bold; transition: all 0.3s ease;">🏛️ Admin</a>
+            <a href="/admin/login" class="btn-primary" style="margin-left: 0.5rem;">
+                <i class="fas fa-lock"></i> Admin
+            </a>
         </div>
     </div>
 
     <!-- Hero Section -->
     <div class="hero">
-        <h2>Discover Amazing Places</h2>
-        <p>Explore tours and book unforgettable experiences</p>
+        <h2>Discover Amazing Destinations</h2>
+        <p>Explore tours and book unforgettable experiences in Tunisia</p>
         <div class="search-bar">
-            <input type="text" placeholder="Search places..."/>
-            <button>Search</button>
+            <input type="text" placeholder="Search places, tours..."/>
+            <button><i class="fas fa-search"></i> Search</button>
         </div>
     </div>
 
@@ -253,49 +104,65 @@
         <h2 class="section-title">Featured Places</h2>
         <div class="gallery" th:if="${listPlaces != null and listPlaces.size() > 0}">
             <div class="place-card" th:each="place : ${listPlaces}">
-                <div class="place-image" th:text="${place.pictureUrl != null ? place.pictureUrl : 'No Image'}"></div>
+                <div class="place-image">
+                    <i class="fas fa-image"></i>
+                </div>
                 <div class="place-content">
                     <h3 th:text="${place.name}"></h3>
-                    <span class="category-badge" th:text="${place.category}"></span>
+                    <span class="place-category" th:text="${place.category}"></span>
                     <p th:text="${#strings.abbreviate(place.description, 100)}"></p>
                     <div class="place-info">
-                        <span th:text="${place.city}"></span>
+                        <span>
+                            <i class="fas fa-map-marker-alt"></i> <span th:text="${place.city}"></span>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="empty-state" th:if="${listPlaces == null or listPlaces.size() == 0}">
+            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem;"></i>
             <p>No places available yet</p>
         </div>
     </div>
 
     <!-- Tours Section -->
     <div class="container">
-        <div class="tours-section">
-            <h2 class="section-title">Available Tours</h2>
-            <div th:if="${tours != null and tours.size() > 0}">
-                <div class="tour-card" th:each="tour : ${tours}">
-                    <div class="tour-content">
-                        <h3 th:text="${tour.name}"></h3>
-                        <p th:text="${'Guide: ' + (tour.guide != null ? tour.guide.firstName + ' ' + tour.guide.lastName : 'N/A')}"></p>
-                        <p th:text="${'Date: ' + tour.date}"></p>
-                        <p th:text="${'Time: ' + tour.startingHour + ' - ' + tour.endingHour}"></p>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="tour-price" th:text="'$' + ${tour.price}"></div>
-                        <button class="tour-button">Book Now</button>
-                    </div>
+        <h2 class="section-title">Available Tours</h2>
+        <div th:if="${tours != null and tours.size() > 0}">
+            <div class="tour-card" th:each="tour : ${tours}">
+                <div class="tour-info">
+                    <h3 th:text="${tour.name}"></h3>
+                    <p>
+                        <i class="fas fa-user"></i>
+                        <span th:text="${'Guide: ' + (tour.guide != null ? tour.guide.firstName + ' ' + tour.guide.lastName : 'TBD')}"></span>
+                    </p>
+                    <p>
+                        <i class="fas fa-calendar"></i>
+                        <span th:text="${'Date: ' + tour.date}"></span>
+                    </p>
+                    <p>
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${'Time: ' + tour.startingHour + ' - ' + tour.endingHour}"></span>
+                    </p>
+                    <p th:text="${tour.description}"></p>
+                </div>
+                <div class="tour-booking">
+                    <div class="tour-price" th:text="'$' + ${tour.price}"></div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-calendar-check"></i> Book Now
+                    </button>
                 </div>
             </div>
-            <div class="empty-state" th:if="${tours == null or tours.size() == 0}">
-                <p>No tours available yet</p>
-            </div>
+        </div>
+        <div class="empty-state" th:if="${tours == null or tours.size() == 0}">
+            <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>No tours available yet</p>
         </div>
     </div>
 
     <!-- Footer -->
-    <div class="footer">
+    <footer>
         <p>&copy; 2025 Tuniway. All rights reserved. | Your Ultimate Tour Booking Platform</p>
-    </div>
+    </footer>
 </body>
 </html>

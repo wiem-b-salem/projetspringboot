@@ -47,7 +47,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints for MVC (Thymeleaf pages)
                 .requestMatchers("/", "/login", "/signup", "/login-process", "/signup-process", 
@@ -60,8 +60,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/**").authenticated()
                 // Admin dashboard pages (will be checked by controller)
                 .requestMatchers("/admin/**").permitAll()
-                // Account pages require authentication
-                .requestMatchers("/account/**").authenticated()
+                // Account pages - controller will check session
+                .requestMatchers("/account/**").permitAll()
                 // All other requests
                 .anyRequest().permitAll()
             )
