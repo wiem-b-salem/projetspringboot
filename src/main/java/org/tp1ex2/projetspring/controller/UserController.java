@@ -6,9 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.tp1ex2.projetspring.model.User;
-import org.tp1ex2.projetspring.model.Guide;
 import org.tp1ex2.projetspring.service.UserService;
-import org.tp1ex2.projetspring.service.GuideService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +20,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private GuideService guideService;
 
     @GetMapping("/add")
     public String addUser(Model model) {

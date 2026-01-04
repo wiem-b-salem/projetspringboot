@@ -10,4 +10,12 @@ public interface PlaceService {
     Place getPlaceById(Long id);
     Place updatePlace(Place place);
     void deletePlace(Long id);
+    
+    // Filter methods
+    List<Place> filterByCategory(String category);
+    List<Place> filterByCity(String city);
+    List<Place> filterByCategoryAndCity(String category, String city);
+    List<Place> searchPlaces(String keyword);
+    List<String> getAllCities();
+    List<String> getAllCategories();
 }

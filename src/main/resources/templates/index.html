@@ -93,9 +93,87 @@
     <div class="hero">
         <h2>Discover Amazing Destinations</h2>
         <p>Explore tours and book unforgettable experiences in Tunisia</p>
-        <div class="search-bar">
-            <input type="text" placeholder="Search places, tours..."/>
-            <button><i class="fas fa-search"></i> Search</button>
+    </div>
+
+    <!-- Tours Filter Section -->
+    <div class="container" style="margin-bottom: 2rem;">
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; color: #1f2937; font-weight: 600;">
+                <i class="fas fa-filter"></i> Filter Tours
+            </h3>
+            <form method="get" action="/" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Search Tour</label>
+                    <input type="text" name="searchTour" placeholder="Tour name or description..." th:value="${searchTour}" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"/>
+                </div>
+                
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Min Price ($)</label>
+                    <input type="number" name="minPrice" placeholder="0" min="0" step="5" th:value="${minPrice}" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"/>
+                </div>
+                
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Max Price ($)</label>
+                    <input type="number" name="maxPrice" placeholder="500" min="0" step="5" th:value="${maxPrice}" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"/>
+                </div>
+                
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Sort By</label>
+                    <select name="sortBy" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                        <option value="">-- Select --</option>
+                        <option value="upcoming" th:selected="${sortBy == 'upcoming'}">Upcoming Tours</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <button type="submit" style="width: 100%; padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem; font-weight: 500; cursor: pointer;">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="/" style="display: inline-block; width: 100%; margin-top: 0.5rem; padding: 0.5rem 1rem; background: #6b7280; color: white; border: none; border-radius: 0.375rem; text-align: center; text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-times"></i> Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Places Filter Section -->
+    <div class="container" style="margin-bottom: 2rem;">
+        <div style="background: white; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h3 style="margin-top: 0; color: #1f2937; font-weight: 600;">
+                <i class="fas fa-filter"></i> Filter Places
+            </h3>
+            <form method="get" action="/" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: flex-end;">
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Search Place</label>
+                    <input type="text" name="searchPlace" placeholder="Place name or description..." th:value="${searchPlace}" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;"/>
+                </div>
+                
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">Category</label>
+                    <select name="placeCategory" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                        <option value="">-- All Categories --</option>
+                        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}" th:selected="${selectedCategory == cat}"></option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label style="display: block; font-weight: 500; margin-bottom: 0.5rem; color: #374151;">City</label>
+                    <select name="placeCity" style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem;">
+                        <option value="">-- All Cities --</option>
+                        <option th:each="city : ${cities}" th:value="${city}" th:text="${city}" th:selected="${selectedCity == city}"></option>
+                    </select>
+                </div>
+                
+                <div>
+                    <button type="submit" style="width: 100%; padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 0.375rem; font-weight: 500; cursor: pointer;">
+                        <i class="fas fa-search"></i> Filter
+                    </button>
+                    <a href="/" style="display: inline-block; width: 100%; margin-top: 0.5rem; padding: 0.5rem 1rem; background: #6b7280; color: white; border: none; border-radius: 0.375rem; text-align: center; text-decoration: none; font-weight: 500;">
+                        <i class="fas fa-times"></i> Reset
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 

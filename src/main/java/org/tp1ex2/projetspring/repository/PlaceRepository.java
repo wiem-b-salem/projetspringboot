@@ -14,4 +14,16 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
 
     @Query("SELECT p FROM Place p WHERE p.category = :category AND p.city = :city")
     List<Place> findByCategoryAndCity(@Param("category") String category, @Param("city") String city);
+
+    @Query("SELECT p FROM Place p WHERE p.category = :category")
+    List<Place> findByType(@Param("category") String category);
+
+    @Query("SELECT p FROM Place p WHERE p.name LIKE %:keyword% OR p.description LIKE %:keyword%")
+    List<Place> searchByKeyword(@Param("keyword") String keyword);
+
+    @Query("SELECT DISTINCT p.city FROM Place p ORDER BY p.city ASC")
+    List<String> findAllCities();
+
+    @Query("SELECT DISTINCT p.category FROM Place p ORDER BY p.category ASC")
+    List<String> findAllCategories();
 }

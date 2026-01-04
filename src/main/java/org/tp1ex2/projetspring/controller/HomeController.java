@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
 
 @Controller
 public class HomeController {
@@ -47,12 +48,57 @@ public class HomeController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/")
-    public String index(Model model, HttpSession session) {
+    public String index(
+            @RequestParam(required = false) String searchTour,
+            @RequestParam(required = false) String searchPlace,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String placeCategory,
+            @RequestParam(required = false) String placeCity,
+            Model model, HttpSession session) {
+        
         User loggedInUser = (User) session.getAttribute("loggedInUser");
-        model.addAttribute("listPlaces", placeService.getAll());
-        model.addAttribute("tours", tourService.getAll());
+        
+        // Handle Tours with combined filtering
+        Boolean isUpcoming = "upcoming".equals(sortBy);
+        var tours = tourService.filterTours(searchTour, minPrice, maxPrice, isUpcoming, LocalDate.now());
+        
+        // Handle Places
+        var places = placeService.getAll();
+        
+        // Search places by keyword
+        if (searchPlace != null && !searchPlace.isEmpty()) {
+            places = placeService.searchPlaces(searchPlace);
+        }
+        
+        // Filter places by category and city
+        if (placeCategory != null && !placeCategory.isEmpty() && placeCity != null && !placeCity.isEmpty()) {
+            places = placeService.filterByCategoryAndCity(placeCategory, placeCity);
+        } else if (placeCategory != null && !placeCategory.isEmpty()) {
+            places = placeService.filterByCategory(placeCategory);
+        } else if (placeCity != null && !placeCity.isEmpty()) {
+            places = placeService.filterByCity(placeCity);
+        }
+        
+        // Get filter options
+        var allCities = placeService.getAllCities();
+        var allCategories = placeService.getAllCategories();
+        
+        model.addAttribute("listPlaces", places);
+        model.addAttribute("tours", tours);
         model.addAttribute("isLoggedIn", loggedInUser != null);
         model.addAttribute("user", loggedInUser);
+        model.addAttribute("cities", allCities);
+        model.addAttribute("categories", allCategories);
+        model.addAttribute("searchTour", searchTour);
+        model.addAttribute("searchPlace", searchPlace);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("selectedCategory", placeCategory);
+        model.addAttribute("selectedCity", placeCity);
+        
         return "index";
     }
 

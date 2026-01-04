@@ -43,4 +43,34 @@ public class PlaceServiceImpl implements PlaceService {
     public void deletePlace(Long id) {
         placeRepository.deleteById(id);
     }
+
+    @Override
+    public List<Place> filterByCategory(String category) {
+        return placeRepository.findByCategory(category);
+    }
+
+    @Override
+    public List<Place> filterByCity(String city) {
+        return placeRepository.findByCity(city);
+    }
+
+    @Override
+    public List<Place> filterByCategoryAndCity(String category, String city) {
+        return placeRepository.findByCategoryAndCity(category, city);
+    }
+
+    @Override
+    public List<Place> searchPlaces(String keyword) {
+        return placeRepository.searchByKeyword(keyword);
+    }
+
+    @Override
+    public List<String> getAllCities() {
+        return placeRepository.findAllCities();
+    }
+
+    @Override
+    public List<String> getAllCategories() {
+        return placeRepository.findAllCategories();
+    }
 }

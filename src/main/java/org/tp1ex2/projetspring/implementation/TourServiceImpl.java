@@ -6,6 +6,7 @@ import org.tp1ex2.projetspring.model.Tour;
 import org.tp1ex2.projetspring.repository.TourRepository;
 import org.tp1ex2.projetspring.service.TourService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -42,5 +43,30 @@ public class TourServiceImpl implements TourService {
     @Override
     public void deleteTour(Long id) {
         tourRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Tour> filterByMaxPrice(Double maxPrice) {
+        return tourRepository.findByMaxPrice(maxPrice);
+    }
+
+    @Override
+    public List<Tour> filterByPriceRange(Double minPrice, Double maxPrice) {
+        return tourRepository.findByPriceRange(minPrice, maxPrice);
+    }
+
+    @Override
+    public List<Tour> getUpcomingTours(LocalDate startDate) {
+        return tourRepository.findUpcomingTours(startDate);
+    }
+
+    @Override
+    public List<Tour> searchTours(String keyword) {
+        return tourRepository.searchByKeyword(keyword);
+    }
+
+    @Override
+    public List<Tour> filterTours(String keyword, Double minPrice, Double maxPrice, Boolean upcoming, LocalDate startDate) {
+        return tourRepository.filterTours(keyword, minPrice, maxPrice, upcoming, startDate);
     }
 }
