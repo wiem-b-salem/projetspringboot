@@ -544,7 +544,7 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Tour</th>
+                                <th>Place/Tour</th>
                                 <th>Rating</th>
                                 <th>Comment</th>
                                 <th>Actions</th>
@@ -552,18 +552,18 @@
                         </thead>
                         <tbody>
                             <tr th:each="review : ${reviews}">
-                                <td th:text="${review.tour != null ? review.tour.name : 'N/A'}"></td>
+                                <td th:text="${review.place != null ? review.place.name : (review.tour != null ? review.tour.name : 'N/A')}"></td>
                                 <td>
                                     <span style="color: #f59e0b;">
-                                        <i class="fas fa-star"></i>
-                                        <span th:text="${review.stars}"></span>
+                                        <span th:text="${'★'.repeat(review.stars) + '☆'.repeat(5 - review.stars)}"></span>
+                                        <span th:text="${review.stars}"></span>/5
                                     </span>
                                 </td>
-                                <td th:text="${#strings.abbreviate(review.comment, 50)}"></td>
+                                <td th:text="${#strings.abbreviate(review.description, 50)}"></td>
                                 <td class="action-buttons">
-                                    <a th:href="@{'/admin/reviews/delete/' + ${review.id}}" class="delete" onclick="return confirm('Delete this review?')">
+                                    <button onclick="deleteReview([[${review.id}]])" class="delete">
                                         <i class="fas fa-trash"></i> Delete
-                                    </a>
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
@@ -591,6 +591,28 @@
 
             document.getElementById(tabName).classList.add('active');
             event.target.closest('.tab-button').classList.add('active');
+        }
+
+        function deleteReview(reviewId) {
+            if (confirm('Delete this review?')) {
+                fetch(`/api/review/delete/${reviewId}`, {
+                    method: 'POST',
+                    credentials: 'include'
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Review deleted successfully!');
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Error deleting review');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Error deleting review');
+                });
+            }
         }
     </script>
 </body>

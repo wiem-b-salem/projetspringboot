@@ -63,4 +63,14 @@ public class ReviewServiceImpl implements ReviewService {
     public void delete(Long id) {
         deleteReview(id);
     }
+
+    @Override
+    public List<Review> getReviewsForPlace(Long placeId) {
+        return reviewRepository.findByPlaceId(placeId);
+    }
+
+    @Override
+    public Double getAverageRatingForPlace(Long placeId) {
+        return reviewRepository.getAverageRatingForPlace(placeId);
+    }
 }

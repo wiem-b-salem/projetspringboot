@@ -21,6 +21,10 @@ public class Review {
     @JoinColumn(name = "tour_id")
     private Tour tour;
 
+    @ManyToOne
+    @JoinColumn(name = "place_id")
+    private Place place;
+
     private Long reviewedEntityId;
 
     private String reviewedEntityType;

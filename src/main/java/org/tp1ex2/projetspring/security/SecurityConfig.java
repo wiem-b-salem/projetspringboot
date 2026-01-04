@@ -55,6 +55,10 @@ public class SecurityConfig {
                 .requestMatchers("/admin/login", "/admin/login-process").permitAll()
                 // Public REST endpoints for authentication
                 .requestMatchers("/api/auth/**").permitAll()
+                // Favorite endpoints - controller will check session
+                .requestMatchers("/api/favorite/**").permitAll()
+                // Review endpoints - controller will check session
+                .requestMatchers("/api/review/**").permitAll()
                 // All other API endpoints require authentication
                 .requestMatchers("/api/**").authenticated()
                 // Admin dashboard pages (will be checked by controller)

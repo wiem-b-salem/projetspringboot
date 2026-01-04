@@ -184,6 +184,9 @@
             <div class="place-card" th:each="place : ${listPlaces}">
                 <div class="place-image">
                     <i class="fas fa-image"></i>
+                    <button class="favorite-btn favorite-place-btn" th:data-place-id="${place.id}" style="position: absolute; top: 0.5rem; right: 0.5rem; background: white; border: none; color: #d1d5db; font-size: 1.5rem; cursor: pointer; border-radius: 50%; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <i class="fas fa-bookmark"></i>
+                    </button>
                 </div>
                 <div class="place-content">
                     <h3 th:text="${place.name}"></h3>
@@ -193,6 +196,16 @@
                         <span>
                             <i class="fas fa-map-marker-alt"></i> <span th:text="${place.city}"></span>
                         </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <div class="rating-display" th:data-place-id="${place.id}" style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #666;">
+                            <span class="avg-rating">-</span>
+                            <span class="rating-stars">★☆☆☆☆</span>
+                            <span class="review-count">(0)</span>
+                        </div>
+                        <button class="review-btn" th:data-place-id="${place.id}" style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.9rem; transition: background 0.2s;">
+                            <i class="fas fa-star"></i> Reviews
+                        </button>
                     </div>
                 </div>
             </div>
@@ -209,7 +222,14 @@
         <div th:if="${tours != null and tours.size() > 0}">
             <div class="tour-card" th:each="tour : ${tours}">
                 <div class="tour-info">
-                    <h3 th:text="${tour.name}"></h3>
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div style="flex: 1;">
+                            <h3 th:text="${tour.name}"></h3>
+                        </div>
+                        <button class="favorite-btn favorite-tour-btn" th:data-tour-id="${tour.id}" style="background: transparent; border: none; color: #d1d5db; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; margin-left: 1rem;">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
                     <p>
                         <i class="fas fa-user"></i>
                         <span th:text="${'Guide: ' + (tour.guide != null ? tour.guide.firstName + ' ' + tour.guide.lastName : 'TBD')}"></span>
@@ -242,5 +262,379 @@
     <footer>
         <p>&copy; 2025 Tuniway. All rights reserved. | Your Ultimate Tour Booking Platform</p>
     </footer>
+
+    <script>
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFavoriteStatus();
+            loadAllRatings();
+            attachReviewButtonHandlers();
+            attachCloseModalHandlers();
+            attachSubmitReviewHandler();
+        });
+
+        function loadFavoriteStatus() {
+            // Check place favorites
+            document.querySelectorAll('.favorite-place-btn').forEach(btn => {
+                const placeId = btn.getAttribute('data-place-id');
+                fetch(`/api/favorite/check-place/${placeId}`, {
+                    credentials: 'include'
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.favorited) {
+                            btn.style.color = '#fbbf24';
+                            btn.innerHTML = '<i class="fas fa-bookmark"></i>';
+                        }
+                    });
+            });
+
+            // Check tour favorites
+            document.querySelectorAll('.favorite-tour-btn').forEach(btn => {
+                const tourId = btn.getAttribute('data-tour-id');
+                fetch(`/api/favorite/check-tour/${tourId}`, {
+                    credentials: 'include'
+                })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.favorited) {
+                            btn.style.color = '#ef4444';
+                            btn.innerHTML = '<i class="fas fa-heart"></i>';
+                        }
+                    });
+            });
+
+            // Add place to favorite click handler
+            document.querySelectorAll('.favorite-place-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const placeId = this.getAttribute('data-place-id');
+                    
+                    fetch(`/api/favorite/add-place/${placeId}`, {
+                        method: 'POST',
+                        credentials: 'include'
+                    })
+                        .then(r => {
+                            if (r.status === 401) {
+                                showLoginPrompt();
+                                return null;
+                            }
+                            return r.json();
+                        })
+                        .then(data => {
+                            if (data) {
+                                if (data.success) {
+                                    btn.style.color = '#fbbf24';
+                                    alert('Added to favorites!');
+                                } else if (data.favorited) {
+                                    alert('Already in favorites!');
+                                }
+                            }
+                        })
+                        .catch(err => console.error('Error:', err));
+                });
+            });
+
+            // Add tour to favorite click handler
+            document.querySelectorAll('.favorite-tour-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tourId = this.getAttribute('data-tour-id');
+                    
+                    fetch(`/api/favorite/add-tour/${tourId}`, {
+                        method: 'POST',
+                        credentials: 'include'
+                    })
+                        .then(r => {
+                            if (r.status === 401) {
+                                showLoginPrompt();
+                                return null;
+                            }
+                            return r.json();
+                        })
+                        .then(data => {
+                            if (data) {
+                                if (data.success) {
+                                    btn.style.color = '#ef4444';
+                                    alert('Added to favorites!');
+                                } else if (data.favorited) {
+                                    alert('Already in favorites!');
+                                }
+                            }
+                        })
+                        .catch(err => console.error('Error:', err));
+                });
+            });
+        }
+
+        // Load ratings for all places
+        function loadAllRatings() {
+            document.querySelectorAll('.rating-display').forEach(element => {
+                const placeId = element.getAttribute('data-place-id');
+                loadPlaceRating(placeId);
+            });
+        }
+
+        // Load place rating
+        function loadPlaceRating(placeId) {
+            fetch(`/api/review/average/${placeId}`, {
+                credentials: 'include'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const element = document.querySelector(`.rating-display[data-place-id="${placeId}"]`);
+                    if (element) {
+                        const avgRating = data.averageRating || 0;
+                        element.querySelector('.avg-rating').textContent = avgRating.toFixed(1);
+                        element.querySelector('.rating-stars').textContent = getStarRating(avgRating);
+                        element.querySelector('.review-count').textContent = `(${data.totalReviews})`;
+                    }
+                }
+            })
+            .catch(err => console.error('Error loading rating:', err));
+        }
+
+        // Get star display based on rating
+        function getStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const hasHalf = rating % 1 >= 0.5;
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) {
+                    stars += '★';
+                } else if (i === fullStars && hasHalf) {
+                    stars += '⭐';
+                } else {
+                    stars += '☆';
+                }
+            }
+            return stars;
+        }
+
+        // Attach review button handlers
+        function attachReviewButtonHandlers() {
+            document.querySelectorAll('.review-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const placeId = this.getAttribute('data-place-id');
+                    console.log('Review button clicked for place:', placeId);
+                    openReviewModal(placeId);
+                });
+            });
+        }
+
+        // Attach modal close handlers
+        function attachCloseModalHandlers() {
+            const closeBtn = document.getElementById('closeReviewModal');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Close button clicked');
+                    document.getElementById('reviewModal').style.display = 'none';
+                });
+            }
+
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('reviewModal');
+                if (e.target === modal) {
+                    console.log('Clicked outside modal');
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        // Attach submit review handler
+        function attachSubmitReviewHandler() {
+            const submitBtn = document.getElementById('submitReviewBtn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Submit review clicked');
+                    submitReview();
+                });
+            }
+        }
+
+        // Submit review
+        function submitReview() {
+            const placeId = document.getElementById('reviewPlaceId').value;
+            const stars = document.getElementById('reviewStars').value;
+            const comment = document.getElementById('reviewComment').value;
+
+            console.log('Submitting review:', { placeId, stars, comment });
+
+            if (!placeId) {
+                alert('Invalid place');
+                return;
+            }
+
+            fetch(`/api/review/add-place/${placeId}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `stars=${stars}&comment=${encodeURIComponent(comment)}`
+            })
+            .then(r => {
+                console.log('Response status:', r.status);
+                if (r.status === 401) {
+                    showLoginPrompt();
+                    return null;
+                }
+                return r.json();
+            })
+            .then(data => {
+                if (!data) return;
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    alert('Review added successfully!');
+                    document.getElementById('reviewStars').value = 5;
+                    document.getElementById('reviewComment').value = '';
+                    openReviewModal(placeId);
+                    loadPlaceRating(placeId);
+                } else {
+                    alert(data.message || 'Error adding review');
+                }
+            })
+            .catch(err => {
+                console.error('Error submitting review:', err);
+                alert('Error submitting review. Please try again.');
+            });
+        }
+
+        // Open review modal
+        function openReviewModal(placeId) {
+            const modal = document.getElementById('reviewModal');
+            const reviewPlaceId = document.getElementById('reviewPlaceId');
+            const reviewsContainer = document.getElementById('reviewsContainer');
+
+            if (!modal) {
+                console.error('Modal element not found');
+                return;
+            }
+
+            reviewPlaceId.value = placeId;
+            reviewsContainer.innerHTML = '<p style="text-align: center; color: #999;">Loading reviews...</p>';
+            
+            // Load existing reviews
+            fetch(`/api/review/place/${placeId}`, {
+                credentials: 'include'
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log('Reviews data:', data);
+                if (data.success) {
+                    displayReviews(data.reviews, placeId);
+                }
+            })
+            .catch(err => console.error('Error loading reviews:', err));
+
+            modal.style.display = 'block';
+        }
+
+        // Display reviews in modal
+        function displayReviews(reviews, placeId) {
+            const container = document.getElementById('reviewsContainer');
+            if (reviews.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">No reviews yet. Be the first to review!</p>';
+                return;
+            }
+
+            const html = reviews.map(review => `
+                <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <strong style="font-size: 1rem;">${review.user.firstName} ${review.user.lastName}</strong>
+                            <div style="color: #f59e0b; font-size: 1.2rem; margin: 0.5rem 0;">
+                                ${'★'.repeat(review.stars)}${'☆'.repeat(5 - review.stars)}
+                            </div>
+                        </div>
+                        <button class="delete-review-btn" data-review-id="${review.id}" style="background: #ef4444; color: white; border: none; padding: 0.25rem 0.75rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.8rem;">Delete</button>
+                    </div>
+                    <p style="color: #4b5563; margin-top: 0.5rem;">${review.description || '(No comment)'}</p>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+
+            // Add delete handlers
+            container.querySelectorAll('.delete-review-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const reviewId = this.getAttribute('data-review-id');
+                    if (confirm('Delete this review?')) {
+                        deleteReview(reviewId, placeId);
+                    }
+                });
+            });
+        }
+
+        // Delete review
+        function deleteReview(reviewId, placeId) {
+            fetch(`/api/review/delete/${reviewId}`, {
+                method: 'POST',
+                credentials: 'include'
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Review deleted!');
+                    openReviewModal(placeId);
+                    loadPlaceRating(placeId);
+                } else {
+                    alert(data.message || 'Error deleting review');
+                }
+            })
+            .catch(err => console.error('Error:', err));
+        }
+
+        function showLoginPrompt() {
+            const response = confirm('You need to login to add reviews. Click OK to go to login page.');
+            if (response) {
+                window.location.href = '/login';
+            }
+        }
+    </script>
+
+    <!-- Review Modal -->
+    <div id="reviewModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
+        <div style="background-color: white; margin: 5% auto; padding: 2rem; border: 1px solid #888; border-radius: 0.5rem; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Reviews & Ratings</h2>
+                <button id="closeReviewModal" style="background: none; border: none; font-size: 2rem; cursor: pointer; color: #666;">&times;</button>
+            </div>
+
+            <input type="hidden" id="reviewPlaceId">
+
+            <!-- Reviews List -->
+            <div id="reviewsContainer" style="margin-bottom: 2rem; max-height: 300px; overflow-y: auto;"></div>
+
+            <!-- Add Review Form -->
+            <div style="border-top: 2px solid #e5e7eb; padding-top: 1.5rem;">
+                <h3 style="margin-top: 0;">Leave a Review</h3>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Rating (1-5 stars)</label>
+                    <select id="reviewStars" style="width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 0.375rem; font-size: 1rem;">
+                        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                        <option value="4">⭐⭐⭐⭐☆ Good</option>
+                        <option value="3">⭐⭐⭐☆☆ Average</option>
+                        <option value="2">⭐⭐☆☆☆ Poor</option>
+                        <option value="1">⭐☆☆☆☆ Terrible</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Comment (optional)</label>
+                    <textarea id="reviewComment" style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 0.375rem; font-size: 1rem; font-family: inherit; resize: vertical; min-height: 100px;"></textarea>
+                </div>
+                <button id="submitReviewBtn" style="background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.375rem; cursor: pointer; font-size: 1rem; font-weight: 500; width: 100%; transition: background 0.2s;">
+                    Submit Review
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -21,4 +21,8 @@ public class Favorite {
     @JoinColumn(name = "place_id")
     private Place place;
 
+    @ManyToOne
+    @JoinColumn(name = "tour_id")
+    private Tour tour;
+
 }
